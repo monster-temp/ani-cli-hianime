@@ -81,13 +81,30 @@ ani-cli -d -e 1 "bleach"
 3. Gets video URL from Megacloud servers using Python extractor
 4. Plays in your video player or downloads
 
-## Credits
+## Credits & Acknowledgments
 
-- Original [ani-cli](https://github.com/pystardust/ani-cli) by pystardust
-- Modified for HiAnime integration
-- Interactive mode and iOS support added
+This project is a fork of the amazing [**ani-cli**](https://github.com/pystardust/ani-cli) by [pystardust](https://github.com/pystardust) and contributors.
+
+### Original ani-cli
+- **Repository:** https://github.com/pystardust/ani-cli
+- **Author:** pystardust and the ani-cli community
+- **Description:** A cli tool to browse and play anime
+
+### What We Changed
+- **Source:** Switched from AllAnime to HiAnime API
+- **Interactive Mode:** Added prompts for anime name, sub/dub selection, and episode number
+- **macOS Compatibility:** Fixed episode list extraction for BSD grep
+- **iOS Support:** Optimized for iSH shell on iPhone/iPad
+- **Megacloud Extractor:** Added Python-based M3U8 URL extraction
+
+### Special Thanks
+- Original ani-cli developers and maintainers for creating such an awesome tool
+- HiAnime for providing a reliable anime streaming source
+- The open-source community
 
 ## License
 
-GPL-3.0
+GPL-3.0 (same as original ani-cli)
+
+This project inherits the GPL-3.0 license from the original ani-cli project.
 
