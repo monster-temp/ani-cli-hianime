@@ -21,10 +21,18 @@ apk upgrade
 ### 2. Install required dependencies
 
 ```bash
-apk add grep sed curl fzf git python3
+apk add grep sed curl fzf git python3 py3-pip
 ```
 
-### 3. Install ani-cli
+### 3. Install Python dependencies
+
+```bash
+pip3 install --user yt-dlp-hianime
+```
+
+This installs the megacloud extractor needed to get video URLs from HiAnime.
+
+### 4. Install ani-cli
 
 ```bash
 # Clone the repository
@@ -42,7 +50,7 @@ chmod +x /usr/local/bin/extract_m3u8.py
 rm -rf ~/.ani-cli-hianime
 ```
 
-### 4. Run ani-cli
+### 5. Run ani-cli
 
 ```bash
 ani-cli

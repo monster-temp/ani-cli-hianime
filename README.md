@@ -37,10 +37,15 @@ apk upgrade
 
 3. Install dependencies:
 ```bash
-apk add grep sed curl fzf git python3
+apk add grep sed curl fzf git python3 py3-pip
 ```
 
-4. Install ani-cli:
+4. Install Python dependencies:
+```bash
+pip3 install --user yt-dlp-hianime
+```
+
+5. Install ani-cli:
 ```bash
 git clone --depth 1 https://github.com/monster-temp/ani-cli-hianime.git ~/.ani-cli-hianime
 cp ~/.ani-cli-hianime/ani-cli /usr/local/bin/ani-cli
@@ -50,7 +55,7 @@ chmod +x /usr/local/bin/extract_m3u8.py
 rm -rf ~/.ani-cli-hianime
 ```
 
-5. Run it:
+6. Run it:
 ```bash
 ani-cli
 ```

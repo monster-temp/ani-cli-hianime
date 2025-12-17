@@ -432,7 +432,7 @@ play() {
         range=$(printf "%s\n" "$ep_list" | sed -nE "/^${start}\$/,/^${end}\$/p")
         [ -z "$range" ] && die "Invalid range!"
         for i in $range; do
-            tput clear
+            command -v tput >/dev/null 2>&1 && tput clear
             ep_no=$i
             printf "\33[2K\r\033[1;34mPlaying episode %s...\033[0m\n" "$ep_no"
             [ "$i" = "$end" ] && unset range
@@ -442,7 +442,7 @@ play() {
         play_episode
     fi
     # moves up to stored position and deletes to end
-    [ "$player_function" != "debug" ] && [ "$player_function" != "download" ] && tput rc && tput ed
+    [ "$player_function" != "debug" ] && [ "$player_function" != "download" ] && command -v tput >/dev/null 2>&1 && tput rc && tput ed
 }
 
 # MAIN
@@ -648,9 +648,9 @@ esac
 [ "$skip_intro" = 1 ] && mal_id="$(ani-skip -q "${skip_title:-${title}}")"
 
 # moves the cursor up one line and clears that line
-tput cuu1 && tput el
+command -v tput >/dev/null 2>&1 && tput cuu1 && tput el
 # stores the position of cursor
-tput sc
+command -v tput >/dev/null 2>&1 && tput sc
 
 # playback & loop
 play
