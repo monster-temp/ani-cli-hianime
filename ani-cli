@@ -262,8 +262,11 @@ if match:
 
     # Extract M3U8 URL using the megacloud extractor
     if [ -f "$megacloud_extractor" ]; then
-        m3u8_url=$(python3 "$megacloud_extractor" "$iframe_link" 2>/dev/null)
-        [ -z "$m3u8_url" ] && die "Failed to extract M3U8 URL from megacloud!"
+        m3u8_url=$(python3 "$megacloud_extractor" "$iframe_link" 2>&1)
+        if [ -z "$m3u8_url" ] || printf "%s" "$m3u8_url" | grep -q "ERROR:"; then
+            printf "Extractor error:\n%s\n" "$m3u8_url" >&2
+            die "Failed to extract M3U8 URL from megacloud!"
+        fi
     else
         die "Megacloud extractor not found at: $megacloud_extractor"
     fi

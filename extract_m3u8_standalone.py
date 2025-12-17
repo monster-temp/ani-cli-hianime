@@ -90,54 +90,81 @@ def extract_m3u8(embed_url):
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             'Referer': 'https://hianime.to/'
         }
-        
-        response = requests.get(embed_url, headers=headers)
-        response.raise_for_status()
-        
-        # Extract the video ID from URL
-        video_id_match = re.search(r'/embed-2/e-1/([^?]+)', embed_url)
+
+        # Extract the video ID from URL first
+        video_id_match = re.search(r'/e-1/([^?]+)', embed_url)
         if not video_id_match:
-            print("ERROR: Could not extract video ID from URL", file=sys.stderr)
+            print(f"ERROR: Could not extract video ID from URL: {embed_url}", file=sys.stderr)
             return None
-            
+
         video_id = video_id_match.group(1)
-        
-        # Get the sources API
+
+        # Get the sources API directly (simpler approach)
         api_url = f"https://megacloud.tv/embed-2/ajax/e-1/getSources?id={video_id}"
-        api_response = requests.get(api_url, headers=headers)
+        api_response = requests.get(api_url, headers=headers, timeout=10)
         api_response.raise_for_status()
-        
+
         data = api_response.json()
-        
-        # Check if sources are encrypted
-        if data.get('encrypted'):
-            # Need to decrypt - get the script
+
+        # Debug: print the response structure
+        print(f"DEBUG: API response keys: {list(data.keys())}", file=sys.stderr)
+
+        # Try to get sources directly first
+        sources = data.get('sources')
+
+        if not sources:
+            print(f"ERROR: No 'sources' field in API response: {data}", file=sys.stderr)
+            return None
+
+        # Check if it's a string (encrypted) or list (plain)
+        if isinstance(sources, str):
+            print("DEBUG: Sources are encrypted, attempting decryption...", file=sys.stderr)
+            # Sources are encrypted - need to decrypt
+            # Get the embed page to find the decryption script
+            response = requests.get(embed_url, headers=headers, timeout=10)
+            response.raise_for_status()
+
             script_match = re.search(r'<script[^>]*src="([^"]*e-1[^"]*)"', response.text)
-            if script_match:
-                script_url = script_match.group(1)
-                if not script_url.startswith('http'):
-                    script_url = 'https://megacloud.tv' + script_url
-                    
-                script_response = requests.get(script_url, headers=headers)
-                key1, key2 = extract_key(script_response.text)
-                
-                if key1 and key2:
-                    encrypted_sources = data.get('sources')
-                    if encrypted_sources:
-                        decrypted = decrypt_source(encrypted_sources, key1, key2)
-                        if decrypted:
-                            sources = json.loads(decrypted)
-                            for source in sources:
-                                if source.get('file', '').endswith('.m3u8'):
-                                    return source['file']
-        else:
-            # Sources are not encrypted
-            sources = data.get('sources', [])
-            for source in sources:
-                if source.get('file', '').endswith('.m3u8'):
-                    return source['file']
-        
-        print("ERROR: No M3U8 URL found in response", file=sys.stderr)
+            if not script_match:
+                print("ERROR: Could not find decryption script in embed page", file=sys.stderr)
+                return None
+
+            script_url = script_match.group(1)
+            if not script_url.startswith('http'):
+                script_url = 'https://megacloud.tv' + script_url
+
+            print(f"DEBUG: Fetching decryption script from: {script_url}", file=sys.stderr)
+            script_response = requests.get(script_url, headers=headers, timeout=10)
+            key1, key2 = extract_key(script_response.text)
+
+            if not key1 or not key2:
+                print("ERROR: Could not extract decryption keys from script", file=sys.stderr)
+                return None
+
+            print(f"DEBUG: Decryption keys found, decrypting...", file=sys.stderr)
+            decrypted = decrypt_source(sources, key1, key2)
+            if not decrypted:
+                print("ERROR: Decryption failed", file=sys.stderr)
+                return None
+
+            try:
+                sources = json.loads(decrypted)
+            except json.JSONDecodeError as e:
+                print(f"ERROR: Failed to parse decrypted sources: {e}", file=sys.stderr)
+                return None
+
+        # Now sources should be a list
+        if not isinstance(sources, list):
+            print(f"ERROR: Sources is not a list: {type(sources)}", file=sys.stderr)
+            return None
+
+        # Find the M3U8 URL
+        for source in sources:
+            if isinstance(source, dict) and source.get('file', '').endswith('.m3u8'):
+                print(f"DEBUG: Found M3U8 URL", file=sys.stderr)
+                return source['file']
+
+        print(f"ERROR: No M3U8 URL found in sources: {sources}", file=sys.stderr)
         return None
         
     except Exception as e:
