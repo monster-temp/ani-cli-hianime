@@ -21,20 +21,12 @@ apk upgrade
 ### 2. Install required dependencies
 
 ```bash
-apk add grep sed curl fzf git python3 py3-pip
+apk add grep sed curl fzf git python3 py3-requests
 ```
 
-### 3. Install Python dependencies
+**Note:** We use `py3-requests` instead of pip because iSH has Python 3.9, and the full yt-dlp-hianime plugin requires Python 3.11+. The standalone extractor works with Python 3.9+.
 
-```bash
-python3 -m pip install --user https://github.com/pratikpatel8982/yt-dlp-hianime/archive/master.zip
-```
-
-This installs the megacloud extractor needed to get video URLs from HiAnime.
-
-**Note:** This may take a few minutes on iSH as it needs to download and compile dependencies.
-
-### 4. Install ani-cli
+### 3. Install ani-cli
 
 ```bash
 # Clone the repository
@@ -42,21 +34,23 @@ git clone --depth 1 https://github.com/monster-temp/ani-cli-hianime.git ~/.ani-c
 
 # Copy scripts to system path
 cp ~/.ani-cli-hianime/ani-cli /usr/local/bin/ani-cli
-cp ~/.ani-cli-hianime/extract_m3u8.py /usr/local/bin/extract_m3u8.py
+cp ~/.ani-cli-hianime/extract_m3u8_standalone.py /usr/local/bin/extract_m3u8_standalone.py
 
 # Make scripts executable
 chmod +x /usr/local/bin/ani-cli
-chmod +x /usr/local/bin/extract_m3u8.py
+chmod +x /usr/local/bin/extract_m3u8_standalone.py
 
 # Clean up
 rm -rf ~/.ani-cli-hianime
 ```
 
-### 5. Run ani-cli
+### 4. Run ani-cli
 
 ```bash
 ani-cli
 ```
+
+**Note:** The standalone extractor is specifically designed for iSH's Python 3.9 environment and doesn't require any pip packages beyond the system `py3-requests`.
 
 ## How It Works
 

@@ -454,9 +454,13 @@ mode="${ANI_CLI_MODE:-sub}"
 mode_was_set="0"  # Track if mode was explicitly set via --dub flag
 download_dir="${ANI_CLI_DOWNLOAD_DIR:-.}"
 # Path to the megacloud extractor script
-# Try global installation first, fall back to local
+# Try global installation first, then standalone, then local
 if [ -f "/usr/local/bin/extract_m3u8.py" ]; then
     megacloud_extractor="/usr/local/bin/extract_m3u8.py"
+elif [ -f "/usr/local/bin/extract_m3u8_standalone.py" ]; then
+    megacloud_extractor="/usr/local/bin/extract_m3u8_standalone.py"
+elif [ -f "$(dirname "$0")/extract_m3u8_standalone.py" ]; then
+    megacloud_extractor="$(dirname "$0")/extract_m3u8_standalone.py"
 else
     megacloud_extractor="$(dirname "$0")/extract_m3u8.py"
 fi
