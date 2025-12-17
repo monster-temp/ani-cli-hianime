@@ -26,15 +26,40 @@ sudo cp extract_m3u8.py /usr/local/bin/extract_m3u8.py
 
 ### iOS (iSH)
 
-1. Install [iSH](https://apps.apple.com/us/app/ish-shell/id1436902243) from App Store
-2. Open iSH and run:
+1. Install [iSH](https://apps.apple.com/us/app/ish-shell/id1436902243) and [Infuse](https://apps.apple.com/us/app/infuse/id1136220934) from App Store
+   - Alternative: Use [VLC](https://apps.apple.com/us/app/vlc-for-mobile/id650377962) instead (add `--vlc` flag)
 
+2. Open iSH and update packages:
 ```bash
-apk add curl sed grep python3 fzf git
-git clone https://github.com/monster-temp/ani-cli-hianime.git
-cd ani-cli-hianime
-chmod +x ani-cli extract_m3u8.py
-./ani-cli
+apk update
+apk upgrade
+```
+
+3. Install dependencies:
+```bash
+apk add grep sed curl fzf git python3
+```
+
+4. Install ani-cli:
+```bash
+git clone --depth 1 https://github.com/monster-temp/ani-cli-hianime.git ~/.ani-cli-hianime
+cp ~/.ani-cli-hianime/ani-cli /usr/local/bin/ani-cli
+cp ~/.ani-cli-hianime/extract_m3u8.py /usr/local/bin/extract_m3u8.py
+chmod +x /usr/local/bin/ani-cli
+chmod +x /usr/local/bin/extract_m3u8.py
+rm -rf ~/.ani-cli-hianime
+```
+
+5. Run it:
+```bash
+ani-cli
+```
+
+**Note:** The script will output an Infuse link by default that you can tap to open in Infuse for iOS.
+
+**Using VLC instead of Infuse:** Add the `--vlc` or `-v` flag to use VLC instead:
+```bash
+ani-cli --vlc
 ```
 
 ## Usage
@@ -63,6 +88,12 @@ ani-cli -e 1-5 "naruto"
 
 # Download instead of streaming
 ani-cli -d -e 1 "bleach"
+
+# Use Infuse instead of VLC (iOS/macOS)
+ani-cli --infuse "one piece"
+
+# Use VLC explicitly
+ani-cli --vlc "one piece"
 ```
 
 ## Requirements

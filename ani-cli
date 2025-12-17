@@ -62,6 +62,8 @@ help_info() {
         Specify the video quality
       -v, --vlc
         Use VLC to play the video
+      -I, --infuse
+        Use Infuse to play the video (iOS/macOS only)
       -V, --version
         Show the version of the script
       -h, --help
@@ -398,6 +400,17 @@ play_episode() {
             printf "\e]8;;vlc://%s\a~~~~~~~~~~~~~~~~~~~~\n~ Tap to open VLC ~\n~~~~~~~~~~~~~~~~~~~~\e]8;;\a\n" "$episode"
             sleep 5
             ;;
+        iSH-infuse)
+            # URL encode the video URL for Infuse
+            encoded_url=$(printf "%s" "$episode" | sed 's/:/%3A/g; s/\//%2F/g; s/?/%3F/g; s/=/%3D/g; s/&/%26/g')
+            printf "\e]8;;infuse://x-callback-url/play?url=%s\a~~~~~~~~~~~~~~~~~~~~~~~\n~ Tap to open Infuse ~\n~~~~~~~~~~~~~~~~~~~~~~~\e]8;;\a\n" "$encoded_url"
+            sleep 5
+            ;;
+        infuse)
+            # macOS Infuse - open using URL scheme
+            encoded_url=$(printf "%s" "$episode" | sed 's/:/%3A/g; s/\//%2F/g; s/?/%3F/g; s/=/%3D/g; s/&/%26/g')
+            open "infuse://x-callback-url/play?url=$encoded_url"
+            ;;
         *) nohup $player_function "$episode" >/dev/null 2>&1 & ;;
     esac
     replay="$episode"
@@ -453,7 +466,7 @@ case "$(uname -a | cut -d " " -f 1,3-)" in
     *Darwin*) player_function="${ANI_CLI_PLAYER:-$(where_iina)}" ;;   # mac OS
     *ndroid*) player_function="${ANI_CLI_PLAYER:-android_mpv}" ;;     # Android OS (termux)
     *MINGW* | *WSL2*) player_function="${ANI_CLI_PLAYER:-mpv.exe}" ;; # Windows OS
-    *ish*) player_function="${ANI_CLI_PLAYER:-iSH}" ;;                # iOS (iSH)
+    *ish*) player_function="${ANI_CLI_PLAYER:-iSH-infuse}" ;;         # iOS (iSH) - defaults to Infuse
     *) player_function="${ANI_CLI_PLAYER:-$(where_mpv)}" ;;           # Linux OS
 esac
 
@@ -479,6 +492,13 @@ while [ $# -gt 0 ]; do
                 MINGW* | *WSL2*) player_function="vlc.exe" ;;
                 *ish*) player_function="iSH" ;;
                 *) player_function="vlc" ;;
+            esac
+            ;;
+        -I | --infuse)
+            case "$(uname -a | cut -d " " -f 1,3-)" in
+                *ish*) player_function="iSH-infuse" ;;
+                *Darwin*) player_function="infuse" ;;
+                *) printf "Infuse is only available on iOS/macOS\n" && exit 1 ;;
             esac
             ;;
         -s | --syncplay)
@@ -556,6 +576,7 @@ case "$player_function" in
     download) dep_ch "ffmpeg" "aria2c" ;;
     android*) printf "\33[2K\rChecking of players on Android is disabled\n" ;;
     *iSH*) printf "\33[2K\rChecking of players on iOS is disabled\n" ;;
+    infuse) printf "\33[2K\rChecking of players on macOS is disabled\n" ;;
     flatpak_mpv) true ;; # handled out of band in where_mpv
     *) dep_ch "$player_function" ;;
 esac
