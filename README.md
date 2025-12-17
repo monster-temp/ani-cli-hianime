@@ -42,7 +42,7 @@ apk add grep sed curl fzf git python3 py3-pip
 
 4. Install Python dependencies:
 ```bash
-pip3 install --user yt-dlp-hianime
+python3 -m pip install --user https://github.com/pratikpatel8982/yt-dlp-hianime/archive/master.zip
 ```
 
 5. Install ani-cli:

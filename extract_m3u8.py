@@ -33,7 +33,7 @@ for path in possible_paths:
 
 if not megacloud_found:
     print("ERROR: Could not find megacloud module. Please install yt-dlp-hianime plugin:", file=sys.stderr)
-    print("  pip3 install --user yt-dlp-hianime", file=sys.stderr)
+    print("  python3 -m pip install --user https://github.com/pratikpatel8982/yt-dlp-hianime/archive/master.zip", file=sys.stderr)
     sys.exit(1)
 
 try:
@@ -41,7 +41,7 @@ try:
 except ImportError as e:
     print(f"ERROR: Failed to import megacloud module: {e}", file=sys.stderr)
     print("Please install yt-dlp-hianime plugin:", file=sys.stderr)
-    print("  pip3 install --user yt-dlp-hianime", file=sys.stderr)
+    print("  python3 -m pip install --user https://github.com/pratikpatel8982/yt-dlp-hianime/archive/master.zip", file=sys.stderr)
     sys.exit(1)
 
 if len(sys.argv) < 2:
